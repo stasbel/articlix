@@ -29,7 +29,7 @@ all: help
 help:	##@miscellaneous	Show this help.
 	@perl -e '$(HELP_FUN)' $(MAKEFILE_LIST)
 
-freeze:	##@basic	Place venv packages into "$REQS_FILE".
+freeze:	##@basic	Place venv packages into reqs file.
 	pip freeze >${REQS_FILE}
 
 deps:	##@basic	Install necessary packages.
