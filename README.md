@@ -1,6 +1,6 @@
 # articlix
 
-Information retrieval project at SPbAU 7th term.
+Information retrieval project at SPbAU 7th term
 
 ## Installation
 
