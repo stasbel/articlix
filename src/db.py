@@ -1,7 +1,6 @@
 import logging
 
 import psycopg2
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 logger = logging.getLogger(__name__)
 
@@ -9,10 +8,10 @@ logger = logging.getLogger(__name__)
 # noinspection SqlDialectInspection
 class PagesDB:
     def __init__(self):
-        self.conn = psycopg2.connect(dbname='postgres')
-        self.conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        self.conn = psycopg2.connect(host='localhost', dbname='postgres')
+        self.conn.set_isolation_level(0)
 
-        with self.conn.cursor() as curs:
+        with self.conn, self.conn.cursor() as curs:
             curs.execute(
                 """
                 CREATE TABLE IF NOT EXISTS pages (
@@ -25,17 +24,16 @@ class PagesDB:
                 """
             )
 
-            # Create md5 hash unique constraint for text.
             curs.execute(
                 """
-                CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS text_uni
+                CREATE UNIQUE INDEX IF NOT EXISTS text_uni
                 ON pages (CAST(md5(TEXT) AS UUID));
                 """
             )
 
     def store(self, page):
-        with self.conn.cursor() as curs:
-            try:
+        try:
+            with self.conn, self.conn.cursor() as curs:
                 curs.execute(
                     """
                     INSERT INTO pages (url, date, last_modified, text) 
@@ -44,23 +42,15 @@ class PagesDB:
                     [str(page.url.norm), page.date,
                      page.last_modified, page.text]
                 )
-                return True
-            except:
-                return False
+            return True
+        except:
+            return False
 
     def size(self):
-        with self.conn.cursor() as curs:
+        with self.conn, self.conn.cursor() as curs:
             curs.execute(
                 """
                 SELECT COUNT(*) FROM pages;
                 """
             )
             return curs.fetchone()[0]
-
-    def clear(self):
-        with self.conn.cursor() as curs:
-            curs.execute(
-                """
-                TRUNCATE TABLE pages;
-                """,
-            )

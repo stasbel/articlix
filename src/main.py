@@ -1,7 +1,6 @@
 import logging
 
 from src.crawler import Crawler
-from src.db import PagesDB
 
 logger = logging.getLogger(__name__)
 
@@ -11,12 +10,11 @@ def parse_seeds():
 
 
 if __name__ == '__main__':
+    # Set up the logger.
     logging.basicConfig(
-        level=logging.WARN,
+        level=logging.WARNING,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
-    db = PagesDB()
-    seeds = parse_seeds()
-    crawler = Crawler(seeds, db)
-    crawler.run()
+    # Run the crawler.
+    Crawler(parse_seeds(), al_least_pages=100).run()
