@@ -3,6 +3,7 @@ import multiprocessing as mp
 from itertools import repeat
 
 from src.db import PagesDB
+from src.exceptions import FetchError
 from src.url import Url
 from src.util import DictToSet, DefaultDict
 from src.web import Site
@@ -77,13 +78,20 @@ class Crawler:
             site = sites[url]
 
             if site.allow_crawl(url):
-                page = site.fetch(url)
+                # Try to fetch an url.
+                page = None
+                try:
+                    page = site.fetch(url)
+                except FetchError:
+                    logger.warning("Fetch error occured at `%s`.", url)
 
-                if page.allow_cache:
-                    logger.info("Storing page at `%s`.", page.url)
-                    db.store(page)
+                # Process page:
+                if page is not None:
+                    if page.allow_cache:
+                        logger.info("Storing page at `%s`.", page.url)
+                        db.store(page)
 
-                for url in page.links:
-                    frontier.put(url)
+                    for url in page.links:
+                        frontier.put(url)
 
             frontier.done()

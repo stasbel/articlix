@@ -71,7 +71,7 @@ class Page:
 
 
 class Fetcher:
-    def __init__(self, delay=None, use_adaptive=True, adaptive_scale=3):
+    def __init__(self, delay=None, use_adaptive=True, adaptive_scale=5):
         self.delay = delay
         self.use_adaptive = use_adaptive
         self.adaptive_scale = adaptive_scale
