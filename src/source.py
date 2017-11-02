@@ -72,3 +72,6 @@ class Analyzer:
 
     def __call__(self, entry):
         return any(source(entry) for source in self.sources)
+
+    def seed(self, url):
+        return any(url.norm in source.seeds for source in self.sources)

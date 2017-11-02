@@ -15,6 +15,8 @@ dateutils = "*"
 requests = "*"
 contexttimer = "*"
 tqdm = "*"
+"html2text" = "*"
+lxml = "*"
 
 
 [dev-packages]

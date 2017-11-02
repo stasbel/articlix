@@ -6,6 +6,7 @@ from itertools import repeat
 
 from tqdm import tqdm
 
+from src.article import Article
 from src.db import PagesDB
 from src.exception import FetchError
 from src.source import Analyzer
@@ -120,8 +121,9 @@ class Crawler:
                     continue
 
                 # Process page and validate new.
-                if page.allow_cache:
-                    db.store(page)
+                if page.allow_cache and not analyzer.seed(url):
+                    article = Article(page)
+                    db.store(page, article)
                     logger.info("Store page at `%s`.", page.url)
                 for url in page.links_gen():
                     if analyzer(url):
