@@ -22,7 +22,7 @@ class PagesDB:
                   date          TIMESTAMP WITH TIME ZONE,
                   last_modified TIMESTAMP WITH TIME ZONE,
                   text          TEXT      NOT NULL
-                );   
+                );
                 """.format(self.name)
             )
 
@@ -36,20 +36,17 @@ class PagesDB:
     def store(self, page):
         try:
             with self.conn, self.conn.cursor() as curs:
-                curs.execute(
-                    """
-                    INSERT INTO {} (url, date, last_modified, text) 
-                    VALUES (%s, %s, %s, %s);
-                    """.format(self.name),
-                    [
-                        str(page.url.norm),
-                        page.date,
-                        page.last_modified,
-                        page.text
-                    ]
-                )
+                query = (
+                    "INSERT INTO {} (url, date, last_modified, text) VALUES ("
+                    "%s, %s, %s, %s);"
+                ).format(self.name)
+                args = [
+                    str(page.url.norm), page.date,
+                    page.last_modified, page.text
+                ]
+                curs.execute(query, args)
             return True
-        except:
+        except psycopg2.Error:
             return False
 
     def size(self):

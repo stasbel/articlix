@@ -68,8 +68,10 @@ install:	##@dev	Install project dependencies.
 
 check:	##@dev	Check project vulnerabilities and code style (pep + flake).
 	$(pip_tool) check
-	$(pip_tool) check --style $(py_files)
-	$(pip_tool) check --unused $(py_files)
+	for file in $(py_files); do \
+		echo "check" $$file ; \
+		$(pip_tool) check --style $$file ; \
+	done
 	$(SUCCESS)
 
 lock:	##@dev	Lock currect env into specific files.

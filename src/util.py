@@ -3,7 +3,7 @@
 import logging
 import os
 
-__all__ = ['maybe_mkdir', 'DictToSet', 'DefaultDict']
+__all__ = ['maybe_mkdir']
 
 logger = logging.getLogger(__name__)
 
@@ -37,19 +37,3 @@ def maybe_mkdir(dir_name):
         logger.info("Chdir to top.")
 
     return do_mk
-
-
-class DictToSet:
-    """Simple dict to set convertion."""
-
-    def __init__(self, d):
-        self._d = d
-
-    def add(self, item):
-        self._d[item] = None
-
-    def __contains__(self, item):
-        return item in self._d
-
-    def __len__(self):
-        return len(self._d)

@@ -13,5 +13,5 @@ if __name__ == '__main__':
     )
 
     # Run the crawler.
-    crawler = Crawler(sources=reliable_sources, al_least_pages=1000)
+    crawler = Crawler(sources=reliable_sources, al_least_pages=100)
     crawler.run()
