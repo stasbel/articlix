@@ -1,12 +1,45 @@
-# ANSI colors.
+# This Makefile provide some useful commands for developing and using this
+# project. Remeber, this is just for the convinience, so dont rely on them
+# too much. You can do all sort of things (including running and using code)
+# all by yourself.
+# Partially based on good style guide on creating Makefiles at
+# `http://clarkgrubb.com/makefile-style-guide`, still not following it blindly.
+# Author: Stanislav Belyaev stasbelyaev96@gmail.com
+
+### PROLOGUE ###
+
+# Basic prologue mashinery from the Makefile style guide
+MAKEFLAGS += --warn-undefined-variables
+SHELL := bash
+.SHELLFLAGS := -eu -o pipefail -c
+.DEFAULT_GOAL := all
+.DELETE_ON_ERROR:
+.SUFFIXES:
+
+### BODY ###
+
+## INTERNAL VARIABLES ##
+
+# ANSI colors
 GREEN  := $(shell tput -Txterm setaf 2)
 WHITE  := $(shell tput -Txterm setaf 7)
 YELLOW := $(shell tput -Txterm setaf 3)
 RESET  := $(shell tput -Txterm sgr0)
 
-# Add the following "help" target to your Makefile and add help text after
-# each target name starting with "##".
-# A category can be added with "@category".
+# Functions for printing color text
+define COLOR_ECHO
+	@echo "${$2}$1${RESET}"
+endef
+SUCCESS := $(call COLOR_ECHO,Success!,GREEN)
+
+## RULES AND TARGETS ##
+
+all: help
+
+# Miscellaneous
+
+# Add the following `help` target to your Makefile and add help text after
+# each target name starting with `##`. A category can be added with `@caregory`.
 HELP_FUN := \
     %help; \
     while(<>) { push @{$$help{$$2 // 'options'}}, [$$1, $$3] if \
@@ -20,22 +53,42 @@ HELP_FUN := \
     }; \
     print "\n"; }
 
-# Consts.
-REQS_FILE := requirements.txt
-
-# Targets.
-all: help
-
 help:	##@miscellaneous	Show this help.
 	@perl -e '$(HELP_FUN)' $(MAKEFILE_LIST)
 
-freeze:	##@basic	Place venv packages into reqs file.
-	pip freeze >${REQS_FILE}
+# Dev
 
-deps:	##@basic	Install necessary packages.
-	pip install -r ${REQS_FILE}
+pip_tool := pipenv
+reqs_dev_file := requirements-dev.txt
+reqs_file := requirements.txt
+py_files := $(shell find . -name "*.py" | cut -c 3-)
+
+install:	##@dev	Install project dependencies.
+	$(pip_tool) install --dev
+
+check:	##@dev	Check project vulnerabilities and code style (pep + flake).
+	$(pip_tool) check
+	$(pip_tool) check --style $(py_files)
+	$(pip_tool) check --unused $(py_files)
+	$(SUCCESS)
+
+lock:	##@dev	Lock currect env into specific files.
+	$(pip_tool) lock
+	$(pip_tool) lock -r -d >$(reqs_dev_file)
+	$(pip_tool) lock -r >$(reqs_file)
+	$(SUCCESS)
+
+# Basic
+
+python := python3
+src_package := src
+
+run:	##@basic	Run current main script.
+	$(python) -m $(src_package)
 
 clean:	##@basic	Do the cleaning, removing unnecessary files.
 	rm -rf *~ \#*
 
-.PHONY: all help freeze deps clean
+## PHONY TARGETS ##
+
+.PHONY: all help install check lock run clean

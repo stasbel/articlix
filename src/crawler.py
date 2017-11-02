@@ -85,7 +85,7 @@ class Crawler:
                 except FetchError:
                     logger.warning("Fetch error occured at `%s`.", url)
 
-                # Process page:
+                # Process page.
                 if page is not None:
                     if page.allow_cache:
                         logger.info("Storing page at `%s`.", page.url)

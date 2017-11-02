@@ -4,16 +4,27 @@ Information retrieval project at SPbAU 7th term
 
 ## Installation
 
+### Dev
+
+We use [pipenv](https://docs.pipenv.org/) as a primary tool for development.  
+See [Pipfile](Pipfile), [Pipfile.lock](Pipfile.lock), 
+[requirements-dev.txt](requirements-dev.txt) and
+[requirements.txt](requirements.txt) for full specification of platform, python
+and dependency packages.
+
+### Makefile
+
+We provided [Makefile](Makefile) for convinient commands implementation.  
+Run `make help` for get info on that.
+
 ### Prerequisites
 
-* **python>=3.6.2** + **pip**
-* **make** for [Makefile](Makefile)
-* **psql** for [crawler](src/crawler.py) to store pages
-
-### Dependensies
-
-`make deps`
+* **psql>=10.0** for [crawler](src/crawler.py) to store pages
 
 ## Usage
 
-Run `make help` for help.
+`make help`
+
+## License
+
+[MIT](LICENSE)

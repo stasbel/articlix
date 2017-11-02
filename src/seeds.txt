@@ -1,4 +1,8 @@
-https://medium.com/
+https://medium.com/tag/artificial-intelligence
+https://medium.com/tag/machine-learning
+https://medium.com/tag/data-science
+https://medium.com/tag/big-data
+# https://medium.com/
 # https://news.ycombinator.com/
 # https://dzone.com/
 # https://hashnode.com/

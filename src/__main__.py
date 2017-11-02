@@ -6,10 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def parse_seeds():
-    return list(filter(
-        lambda s: s[0] != '#',
-        open('seeds.txt').read().splitlines()
-    ))
+    return [_[:-1] for _ in open('seeds.txt') if not _.startswith('#')]
 
 
 if __name__ == '__main__':
@@ -20,4 +17,4 @@ if __name__ == '__main__':
     )
 
     # Run the crawler.
-    Crawler(parse_seeds(), al_least_pages=100 * 1000 + 1).run()
+    # Crawler(parse_seeds(), al_least_pages=100 * 1000 + 1).run()
