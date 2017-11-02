@@ -26,7 +26,8 @@ class Url:
         return Url(url_unparse(
             parsed_url._replace(
                 scheme=scheme,
-                netloc=netloc)
+                netloc=netloc,
+                query='')
         ))
 
     @lazy_property
@@ -35,6 +36,9 @@ class Url:
 
     def __add__(self, other):
         return Url(url_join(self._url_str, str(other)))
+
+    def __radd__(self, other):
+        return Url(str(other)) + self
 
     def __str__(self):
         return self._url_str

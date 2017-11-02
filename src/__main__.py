@@ -1,13 +1,9 @@
 import logging
 
 from src.crawler import Crawler
+from src.source import reliable_sources
 
 logger = logging.getLogger(__name__)
-
-
-def parse_seeds():
-    return [_[:-1] for _ in open('seeds.txt') if not _.startswith('#')]
-
 
 if __name__ == '__main__':
     # Set up the logger.
@@ -17,4 +13,5 @@ if __name__ == '__main__':
     )
 
     # Run the crawler.
-    # Crawler(parse_seeds(), al_least_pages=100 * 1000 + 1).run()
+    crawler = Crawler(sources=reliable_sources, al_least_pages=1000)
+    crawler.run()

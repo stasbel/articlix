@@ -1,44 +1,58 @@
 import logging
 import time
-from urllib.request import Request, urlopen
+from collections import namedtuple
 from urllib.robotparser import RobotFileParser
 
+import requests
 from bs4 import BeautifulSoup
+from contexttimer import Timer
 from dateutil import parser as date_parser
 from lazy_property import LazyProperty as lazy_property
 
-from src.exceptions import FetchError
+from src import USER_AGENT
+from src.exception import FetchError
 from src.url import Url
 
 logger = logging.getLogger(__name__)
 
-USER_AGENT = "crawler"
-
 
 class Page:
-    def __init__(self, url, head, text):
+    def __init__(self, url, headers, text):
         self.url = url
-        self.head = head
+        self.head = headers
         self.text = text
-
-    def _head_field(self, field):
-        if field in self.head:
-            return self.head[field]
-        return None
 
     @lazy_property
     def date(self):
-        date = self._head_field('Date')
+        date = self.head.get('Date', None)
         if date is not None:
             date = date_parser.parse(date)
         return date
 
     @lazy_property
     def last_modified(self):
-        last_modified = self._head_field('Last-Modified')
+        last_modified = self.head.get('Last-Modified', None)
         if last_modified is not None:
             last_modified = date_parser.parse(last_modified)
         return last_modified
+
+    @lazy_property
+    def allow_cache(self):
+        return not self._have_perm('NOCACHE')
+
+    @lazy_property
+    def allow_follow(self):
+        return not self._have_perm('NOFOLLOW')
+
+    def links_gen(self):
+        if not self.allow_follow:
+            return
+
+        for link_node in self._soup.find_all('a'):
+            url_str = link_node.get('href')
+            if url_str is not None:
+                url = Url(link_node.get('href'))
+                yield url if url.absolute else self.url + url
 
     @lazy_property
     def _soup(self):
@@ -50,24 +64,21 @@ class Page:
                 return True
         return False
 
-    @lazy_property
-    def allow_follow(self):
-        return not self._have_perm('NOFOLLOW')
 
-    @lazy_property
-    def allow_cache(self):
-        return not self._have_perm('NOCACHE')
+Response = namedtuple('Response', 'headers text elapsed ended')
 
-    @lazy_property
-    def links(self):
-        urls = []
-        if self.allow_follow:
-            for link_node in self._soup.find_all('a'):
-                url_str = link_node.get('href')
-                if url_str is not None:
-                    url = Url(link_node.get('href'))
-                    urls.append(url if url.absolute else self.url + url)
-        return urls
+
+def fetch_raw(url, method='GET', strict=True):
+    try:
+        with Timer() as t:
+            r = requests.request(method, str(url),
+                                 headers={'User-Agent': USER_AGENT})
+            r.raise_for_status()
+        return Response(r.headers, r.text, t.elapsed, t.end)
+    except requests.exceptions.HTTPError as e:
+        if strict:
+            raise FetchError("Failed to get data") from e
+    return None
 
 
 class Fetcher:
@@ -76,77 +87,55 @@ class Fetcher:
         self.use_adaptive = use_adaptive
         self.adaptive_scale = adaptive_scale
 
-        self._last_fetched = None
         self._t = None
+        self._last_fetched = None
 
-    @staticmethod
-    def fetch_raw(url):
-        try:
-            conn = urlopen(
-                Request(str(url), headers={'User-Agent': USER_AGENT})
-            )
-            return dict(conn.info()), conn.read().decode('utf-8')
-        except Exception as e:
-            raise FetchError('Failed to get data') from e
-
-    def fetch(self, url):
-        if self._last_fetched is not None:
-            time_passed = time.time() - self._last_fetched
-
-            if self.delay is not None:
-                time.sleep(max(self.delay - time_passed, 0))
-
-            if self.delay is None and self.use_adaptive:
-                time.sleep(max(self.adaptive_scale * self._t - time_passed, 0))
-
-        self._t = time.time()
-        header, content = self.fetch_raw(url)
-        self._last_fetched = time.time()
+    def __call__(self, url):
+        self._cool_down()
+        headers, text, self._t, self._last_fetched = fetch_raw(url)
         logging.info("Last fetched time is `%s`.", self._last_fetched)
-        self._t = self._last_fetched - self._t
+        return Page(url, headers, text)
 
-        return Page(url, header, content)
+    def _cool_down(self):
+        if self._last_fetched is None:
+            return
+
+        time_passed = time.time() - self._last_fetched
+
+        if self.delay is not None:
+            time.sleep(max(self.delay - time_passed, 0))
+
+        if self.delay is None and self.use_adaptive:
+            time.sleep(max(self.adaptive_scale * self._t - time_passed, 0))
 
 
 class Site:
+    DEFAULT_ROBOTS = 'User-Agent: *\nAllow: /'
+
     def __init__(self, url):
         self.url = url
-
-    @lazy_property
-    def _robots(self):
-        robots = RobotFileParser()
-
-        robots_raw = None
-        try:
-            _, robots_raw = Fetcher.fetch_raw(self.url.site + '/robots.txt')
-        except FetchError:
-            pass
-
-        if robots_raw is not None:
-            robots.parse(robots_raw.splitlines())
-
-        return robots
 
     def allow_crawl(self, url):
         return self._robots.can_fetch(USER_AGENT, str(url))
 
+    def fetch(self, url):
+        return self._fetcher(url)
+
+    @lazy_property
+    def _robots(self):
+        robots = RobotFileParser()
+        r = fetch_raw(self.url.site + '/robots.txt', strict=False)
+        if r is None:
+            robots.parse(self.DEFAULT_ROBOTS)
+        else:
+            robots.parse(r.text.splitlines())
+        return robots
+
     @lazy_property
     def _fetcher(self):
-        crawl_delay = None
-
-        try:
-            crawl_delay = self._robots.crawl_delay(USER_AGENT)
-        except:
-            pass
-
+        crawl_delay = self._robots.crawl_delay(USER_AGENT)
         if crawl_delay is None:
-            try:
-                request_rate = self._robots.request_rate(USER_AGENT)
+            request_rate = self._robots.request_rate(USER_AGENT)
+            if request_rate is not None:
                 crawl_delay = request_rate[1] / request_rate[0]
-            except:
-                pass
-
         return Fetcher(crawl_delay)
-
-    def fetch(self, url):
-        return self._fetcher.fetch(url)

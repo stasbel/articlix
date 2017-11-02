@@ -25,6 +25,11 @@ Run `make help` for get info on that.
 
 `make help`
 
+### Crawler
+
+Run the Crawler!
+![Crawler](images/crawler_prograss_bar.png)
+
 ## License
 
 [MIT](LICENSE)

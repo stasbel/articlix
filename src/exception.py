@@ -1,10 +1,10 @@
-"""Module for custom exceptions."""
+"""Module for custom exceptions"""
 
 __all__ = ['FetchError']
 
 
 class _Error(Exception):
-    """Base class for all custom exceptions within module."""
+    """Base class for all custom exceptions within module"""
 
 
 class FetchError(_Error):

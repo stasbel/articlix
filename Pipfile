@@ -12,6 +12,9 @@ lazy-property = "*"
 url-normalize = "*"
 "beautifulsoup4" = "*"
 dateutils = "*"
+requests = "*"
+contexttimer = "*"
+tqdm = "*"
 
 
 [dev-packages]

@@ -3,8 +3,6 @@
 import logging
 import os
 
-from collections import UserDict
-
 __all__ = ['maybe_mkdir', 'DictToSet', 'DefaultDict']
 
 logger = logging.getLogger(__name__)
@@ -55,16 +53,3 @@ class DictToSet:
 
     def __len__(self):
         return len(self._d)
-
-
-class DefaultDict(UserDict):
-    """Simple dict with default missing key func."""
-
-    def __init__(self, *args, **kwargs):
-        self.default = kwargs.pop('default', None)
-        super().__init__(*args, **kwargs)
-
-    def __missing__(self, key):
-        if self.default is not None:
-            self.data[key] = self.default(key)
-        return self.data[key]
