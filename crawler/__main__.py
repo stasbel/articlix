@@ -1,7 +1,7 @@
 import logging
 
-from src.crawler import Crawler
-from src.source import reliable_sources
+from crawler.crawler import Crawler
+from crawler.source import reliable_sources
 
 logger = logging.getLogger(__name__)
 
@@ -13,5 +13,5 @@ if __name__ == '__main__':
     )
 
     # Run the crawler.
-    crawler = Crawler(sources=reliable_sources, al_least_pages=100)
+    crawler = Crawler(sources=reliable_sources, al_least_pages=50)
     crawler.run()

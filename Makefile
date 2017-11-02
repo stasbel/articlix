@@ -83,10 +83,10 @@ lock:	##@dev	Lock currect env into specific files.
 # Basic
 
 python := python3
-src_package := src
+task := crawler
 
-run:	##@basic	Run current main script.
-	$(python) -m $(src_package)
+run:	##@basic	Run task execution.
+	$(python) -m $(task)
 
 clean:	##@basic	Do the cleaning, removing unnecessary files.
 	rm -rf *~ \#*

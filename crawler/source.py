@@ -3,7 +3,7 @@ import re
 
 from lazy_property import LazyProperty as lazy_property
 
-from src.url import Url
+from crawler.url import Url
 
 logger = logging.getLogger(__name__)
 

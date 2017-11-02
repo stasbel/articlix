@@ -17,6 +17,8 @@ contexttimer = "*"
 tqdm = "*"
 "html2text" = "*"
 lxml = "*"
+nltk = "*"
+numpy = "*"
 
 
 [dev-packages]

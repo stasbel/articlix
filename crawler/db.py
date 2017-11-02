@@ -38,8 +38,8 @@ class PagesDB:
         with self.conn, self.conn.cursor() as curs:
             try:
                 query = (
-                    "INSERT INTO {} (url, date, last_modified, title, content) "
-                    "VALUES (%s, %s, %s, %s, %s);"
+                    "INSERT INTO {} (url, date, last_modified, title, content)"
+                    " VALUES (%s, %s, %s, %s, %s);"
                 ).format(self.name)
                 args = [
                     str(page.url.norm), page.date, page.last_modified,

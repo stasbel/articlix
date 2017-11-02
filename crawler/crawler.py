@@ -6,11 +6,11 @@ from itertools import repeat
 
 from tqdm import tqdm
 
-from src.article import Article
-from src.db import PagesDB
-from src.exception import FetchError
-from src.source import Analyzer
-from src.web import Site
+from crawler.article import Article
+from crawler.db import PagesDB
+from crawler.exception import FetchError
+from crawler.source import Analyzer
+from crawler.web import Site
 
 logger = logging.getLogger(__name__)
 
