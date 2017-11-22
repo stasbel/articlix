@@ -4,13 +4,13 @@ import time
 from contextlib import contextmanager
 from itertools import repeat
 
-from tqdm import tqdm
-
 from crawler.article import Article
 from crawler.db import PagesDB
 from crawler.exception import FetchError
-from crawler.source import Analyzer
 from crawler.web import Site
+from tqdm import tqdm
+
+from articlix.crawler.source import Analyzer
 
 logger = logging.getLogger(__name__)
 

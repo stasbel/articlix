@@ -19,20 +19,19 @@ Run `make help` for get info on that.
 
 ### Prerequisites
 
-* **psql>=10.0** for [crawler](crawler/crawler.py) to store pages
+* **psql>=10.0** for [crawler](articlix/crawler/crawler.py) to store pages
 
 ## Usage
 
-`make help`
+We provided [main.py](main.py) script, which implements cli interface.  
+Run `python main.py -h` to get info on that.
 
 ### Crawler
 
-Run the Crawler with `make task=crawler run` (default task)!
-![Crawler](images/crawler_prograss_bar.png)
+![Crawler](images/crawler_progress_bar.png)
 
 ### Index
 
-Then, build the Index with `make task=index run`!
 ![Index](images/index_result.png)
 
 ## License

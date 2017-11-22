@@ -9,9 +9,9 @@ from contexttimer import Timer
 from dateutil import parser as date_parser
 from lazy_property import LazyProperty as lazy_property
 
-from crawler import USER_AGENT
-from crawler.exception import FetchError
-from crawler.url import Url
+from articlix.crawler import FetchError
+from articlix.crawler import USER_AGENT
+from articlix.crawler import Url
 
 logger = logging.getLogger(__name__)
 
