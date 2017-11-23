@@ -4,13 +4,26 @@ from urllib.parse import urlparse as url_parse, \
 from lazy_property import LazyProperty as lazy_property
 from url_normalize import url_normalize
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Url:
     def __init__(self, url_str):
         self._url_str = url_str
 
     @lazy_property
-    def absolute(self):
+    def is_valid(self):
+        answer = True
+        try:
+            url_normalize(self._url_str)
+        except:
+            answer = False
+        return answer
+
+    @lazy_property
+    def is_absolute(self):
         return bool(url_parse(self._url_str).netloc)
 
     @lazy_property
@@ -35,13 +48,16 @@ class Url:
         return Url('/'.join(str(self.norm).split('/')[:3]) + '/')
 
     def __add__(self, other):
-        return Url(url_join(self._url_str, str(other)))
+        return Url(url_join(str(self.norm) + '/', str(other)))
 
     def __radd__(self, other):
         return Url(str(other)) + self
 
     def __str__(self):
         return self._url_str
+
+    def __repr__(self):
+        return self.__str__()
 
     def __eq__(self, other):
         return str(self.norm) == str(other.norm)

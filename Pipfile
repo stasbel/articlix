@@ -19,6 +19,8 @@ tqdm = "*"
 lxml = "*"
 nltk = "*"
 numpy = "*"
+lazy = "*"
+dateparser = "*"
 
 
 [dev-packages]

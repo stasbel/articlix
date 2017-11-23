@@ -23,13 +23,12 @@ class Reverse_index:
         if word not in self.index_dict:
             lock.acquire()
             self.index_dict[word] = dict(
-                {document_id: set([(position, in_title)])})
+                {document_id: {(position, in_title)}})
             lock.release()
         else:
             if document_id not in self.index_dict[word]:
                 lock.acquire()
-                self.index_dict[word][document_id] = set(
-                    [(position, in_title)])
+                self.index_dict[word][document_id] = {(position, in_title)}
                 lock.release()
             else:
                 lock.acquire()
@@ -107,5 +106,5 @@ def build_index(db_name="pages", workers_num=None):
     final_index = Reverse_index()
     for index in result_indexes:
         final_index.update(index)
-    final_index.print()
+    # final_index.print()
     final_index.to_file()

@@ -35,7 +35,7 @@ def parse_args():
             setattr(namespace, 'loglevel', values.upper())
 
     parser.add_argument('--loglevel', dest='loglevel', type=str,
-                        default='INFO', action=UpperAction,
+                        default='WARNING', action=UpperAction,
                         help='Set logging level (default: %(default)s).')
     return parser.parse_args()
 
