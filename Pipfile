@@ -21,6 +21,10 @@ nltk = "*"
 numpy = "*"
 lazy = "*"
 dateparser = "*"
+jupyter = "*"
+pandas = "*"
+tables = "*"
+ujson = "*"
 
 
 [dev-packages]

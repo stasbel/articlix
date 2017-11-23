@@ -69,12 +69,12 @@ class Analyzer:
 
 class Crawler:
     def __init__(self, sources, workers_num=None,
-                 table_name='pages', new_table=True, al_least_pages=10):
+                 table_name='pages', new_table=True, al_least_articles=10):
         self.sources = sources
         self.workers = workers_num
         self.table_name = table_name
         self.new_table = new_table
-        self.al_least_pages = al_least_pages
+        self.al_least_pages = al_least_articles
 
     def run(self):
         # Making a process pool of worker and a manger to share data.

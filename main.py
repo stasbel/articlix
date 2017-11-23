@@ -1,6 +1,7 @@
 import argparse
 
 from runpy import run_module
+import multiprocessing as mp
 
 __all__ = ['parse_args']
 
@@ -37,6 +38,16 @@ def parse_args():
     parser.add_argument('--loglevel', dest='loglevel', type=str,
                         default='WARNING', action=UpperAction,
                         help='Set logging level (default: %(default)s).')
+    parser.add_argument('--dfpath', dest='dfpath', type=str,
+                        help='Path to df')
+    parser.add_argument('--indexpath', dest='indexpath', type=str,
+                        help='Path for index to save at')
+    parser.add_argument('--workers', dest='workers',
+                        type=int, default=mp.cpu_count(),
+                        help='Number of workers to work in parallel')
+    parser.add_argument('--articles', dest='articles',
+                        type=int, default=10000,
+                        help='Minumin number of atricles to crawl')
     return parser.parse_args()
 
 

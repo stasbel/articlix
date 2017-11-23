@@ -28,11 +28,16 @@ Run `python main.py -h` to get info on that.
 
 ### Crawler
 
-![Crawler](images/crawler_progress_bar.png)
+`python main.py crawler`
 
 ### Index
 
-![Index](images/index_result.png)
+U can now preprocess data (look at [this](articlix/index/clean.ipynb)).  
+Then, `python main.py --dfpath="data/clean_articles.h5" --indexpath="data/index.json" --workers=8 index`.
+
+### Data
+
+[Where to find prepared data](data/where.txt)
 
 ## License
 

@@ -1,12 +1,18 @@
+import logging
 import multiprocessing as mp
 import pickle
+import time
 from multiprocessing.dummy import Lock
 
 import nltk
-import psycopg2
+import pandas as pd
+import ujson
 from nltk import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
+from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
 
 lock = Lock()
 
@@ -35,9 +41,14 @@ class Reverse_index:
                 self.index_dict[word][document_id].add((position, in_title))
                 lock.release()
 
-    def to_file(self, filename="reverse_index_file"):
-        with open(filename, 'wb') as f:
-            pickle.dump(self.index_dict, f)
+    def to_file(self, filename):
+        def flatten(d):
+            return list((k, p, i) for k, v in d.items() for p, i in v)
+
+        fii = {k: flatten(v) for k, v in self.index_dict.items()}
+
+        with open(filename, 'w') as f:
+            ujson.dump(fii, f)
 
     def print(self):
         print("print")
@@ -76,35 +87,49 @@ def get_tokens(text):
     return filtered_tokens
 
 
-def _worker(raw_from_db):
+def _worker(df_str, gi, lock):
     index = Reverse_index()
-    document_id, _, _, _, document_title, document_text = raw_from_db
+    id, title, content = df_str
 
     def add_words(text, is_title):
         for i, word in enumerate(get_tokens(text)):
-            index.add_word(word, document_id, i, is_title)
+            index.add_word(word, id, i, is_title)
 
-    add_words(document_title, True)
-    add_words(document_text, False)
+    add_words(title, True)
+    add_words(content, False)
+
+    with lock:
+        gi.value += 1
+
     return index
 
 
-def build_index(db_name="pages", workers_num=None):
-    workers = workers_num or mp.cpu_count()
-    pool = mp.Pool(processes=workers)
+def build_index(dfpath, indexpath, workers_num=None):
+    with mp.Manager() as manager, \
+            mp.Pool(processes=workers_num or mp.cpu_count()) as pool:
+        print('Read df')
+        df = pd.read_hdf(dfpath)
 
-    conn = psycopg2.connect(host='localhost', dbname='postgres',
-                            user='postgres')
-    conn.set_isolation_level(0)
-    args = []
+        print('Make args')
+        args = []
+        gi = manager.Value('i', 0)
+        lock = manager.Lock()
+        for i, s in tqdm(df.iterrows(), total=len(df)):
+            args.append(tuple([(i, s['title'], s['content']), gi, lock]))
 
-    with conn, conn.cursor() as cur:
-        cur.execute("SELECT * FROM {};".format(db_name))
-        for record in cur:
-            args.append((record,))
-    result_indexes = pool.starmap(_worker, args)
-    final_index = Reverse_index()
-    for index in result_indexes:
-        final_index.update(index)
-    # final_index.print()
-    final_index.to_file()
+        print('Make index')
+        result_indexes = pool.starmap_async(_worker, args, chunksize=1)
+        with tqdm(total=len(df)) as pbar:
+            while gi.value < len(df):
+                pred = gi.value
+                time.sleep(1)
+                after = gi.value
+                pbar.update(after - pred)
+
+        print('Collect index')
+        final_index = Reverse_index()
+        for index in tqdm(result_indexes.get()):
+            final_index.update(index)
+
+        print('Serialize index')
+        final_index.to_file(indexpath)
