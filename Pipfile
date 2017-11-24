@@ -25,6 +25,7 @@ jupyter = "*"
 pandas = "*"
 tables = "*"
 ujson = "*"
+pyenchant = "*"
 
 
 [dev-packages]

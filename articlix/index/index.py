@@ -7,6 +7,7 @@ from multiprocessing.dummy import Lock
 import nltk
 import pandas as pd
 import ujson
+from enchant.checker import SpellChecker
 from nltk import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
@@ -74,14 +75,27 @@ class Reverse_index:
                 self.index_dict[word] = dict(new_index.index_dict[word])
 
 
-def get_tokens(text):
+tokenizer = RegexpTokenizer(r'\w+')
+stemmer = PorterStemmer()
+spellchecker = SpellChecker('en_US')
+
+
+def correct(token):
+    suggestions = spellchecker.suggest(token)
+    if len(suggestions):
+        return suggestions[0]
+    else:
+        return token
+
+
+def get_tokens(text, spellcheck=False):
     # get rid of punctuation, stop words and do steming
-    tokenizer = RegexpTokenizer(r'\w+')
-    stemmer = PorterStemmer()
     tokens = tokenizer.tokenize(text)
+    if spellcheck:
+        tokens = [correct(token) for token in tokens]
     tokens.extend([x + " " + y for x, y in nltk.bigrams(tokens)])
-    filtered_tokens = [word for word in tokens if
-                       word not in stopwords.words('english')]
+    filtered_tokens = [word for word in tokens
+                       if word not in stopwords.words('english')]
     for i in range(len(filtered_tokens)):
         filtered_tokens[i] = stemmer.stem(filtered_tokens[i])
     return filtered_tokens
