@@ -39,6 +39,10 @@ Then, `python main.py --dfpath="data/clean_articles.h5" --indexpath="data/index.
 
 [Where to find prepared data](data/where.txt)
 
+### Search
+
+[Examples](articlix/search/search.ipynb)
+
 ## License
 
 [MIT](LICENSE)
