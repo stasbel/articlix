@@ -13,7 +13,7 @@ class PagesDB:
 
         self.conn = psycopg2.connect(host='localhost',
                                      dbname='postgres',
-                                     options='-c statement_timeout=1000')
+                                     options='-c statement_timeout=1000', user='postgres')
         self.conn.set_isolation_level(0)
 
         with self.conn, self.conn.cursor() as curs:

@@ -5,7 +5,7 @@ from functools import lru_cache
 import numpy as np
 
 sys.path.append("..")
-from index.index import get_tokens
+from articlix.index.index import get_tokens
 
 
 class Articlix:
@@ -65,12 +65,12 @@ class Articlix:
             by, ascending = order[0], order[1] == 'asc'
         subdf.sort_values(by, ascending=ascending, inplace=True)
 
-        # Return urls maybe with scores
+        # Return all info maybe with scores
         urls = subdf.url.tolist()
         if add_scores:
-            return list(zip(subdf.scores, urls))
+            return list(zip(subdf.scores, subdf))
         else:
-            return urls
+            return subdf
 
     def _scores(self, q, spellcheck):
         vecs = []

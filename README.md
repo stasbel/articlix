@@ -35,6 +35,12 @@ Run `python main.py -h` to get info on that.
 U can now preprocess data (look at [this](articlix/index/clean.ipynb)).  
 Then, `python main.py --dfpath="data/clean_articles.h5" --indexpath="data/index.json" --workers=8 index`.
 
+### Web interface
+
+`python main.py web_interface`
+
+Then you can find page on port 8080.
+
 ### Data
 
 [Where to find prepared data](data/where.txt)
