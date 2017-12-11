@@ -1,10 +1,8 @@
 import math
-import sys
 from functools import lru_cache
 
 import numpy as np
 
-sys.path.append("..")
 from articlix.index.index import get_tokens
 
 
@@ -34,7 +32,7 @@ class Articlix:
                                 for prior in self.priors)
 
     @lru_cache(maxsize=1024)
-    def find(self, q, *, topn=5, add_scores=False, order=None):
+    def find(self, q, *, topn=5, add_scores=True, order='scores'):
         # Combine with spellchecking
         if self.spellcheck:
             wos = self._scores(q, False)
@@ -57,8 +55,6 @@ class Articlix:
         # Sort accoeding to order
         subdf = self.meta.iloc[rank].copy()
         subdf['scores'] = scores[subdf.index]
-        if order is None:
-            order = 'scores'
         if isinstance(order, str):
             by, ascending = order, False
         else:
@@ -66,15 +62,14 @@ class Articlix:
         subdf.sort_values(by, ascending=ascending, inplace=True)
 
         # Return all info maybe with scores
-        urls = subdf.url.tolist()
         if add_scores:
-            return list(zip(subdf.scores, subdf))
-        else:
             return subdf
+        else:
+            return subdf.drop('scores', axis=1)
 
     def _scores(self, q, spellcheck):
         vecs = []
-        for t in get_tokens(q, spellcheck):
+        for _, t in get_tokens(q, spellcheck):
             idf = self._idf(t)
             tf = self._tf_vec(t)
             vecs.append(idf * ((self.c1 * tf) / (self.c2 + tf)))

@@ -2,11 +2,10 @@ import logging
 import multiprocessing as mp
 import pickle
 import time
+import ujson
 from multiprocessing.dummy import Lock
 
-import nltk
 import pandas as pd
-import ujson
 from enchant.checker import SpellChecker
 from nltk import PorterStemmer
 from nltk.corpus import stopwords
@@ -75,13 +74,8 @@ class Reverse_index:
                 self.index_dict[word] = dict(new_index.index_dict[word])
 
 
-tokenizer = RegexpTokenizer(r'\w+')
-stemmer = PorterStemmer()
-spellchecker = SpellChecker('en_US')
-
-
 def correct(token):
-    suggestions = spellchecker.suggest(token)
+    suggestions = SpellChecker('en_US').suggest(token)
     if len(suggestions):
         return suggestions[0]
     else:
@@ -89,16 +83,30 @@ def correct(token):
 
 
 def get_tokens(text, spellcheck=False):
-    # get rid of punctuation, stop words and do steming
-    tokens = tokenizer.tokenize(text)
-    if spellcheck:
-        tokens = [correct(token) for token in tokens]
-    tokens.extend([x + " " + y for x, y in nltk.bigrams(tokens)])
-    filtered_tokens = [word for word in tokens
-                       if word not in stopwords.words('english')]
-    for i in range(len(filtered_tokens)):
-        filtered_tokens[i] = stemmer.stem(filtered_tokens[i])
-    return filtered_tokens
+    tokenizer = RegexpTokenizer(r'\w+')
+    stemmer = PorterStemmer()
+
+    # Basic
+    tokens = [(s, text[s:e].lower()) for s, e in tokenizer.span_tokenize(text)]
+    if spellcheck: tokens = [(i, correct(word)) for i, word in tokens]
+    tokens = [(i, stemmer.stem(word)) for i, word in tokens]
+
+    # Stop words and bigrams
+    en_stopwords = stopwords.words('english')
+    prev_token = None
+    new_tokens = []
+    for i, word in tokens:
+        if word in en_stopwords:
+            prev_token = None
+        else:
+            new_tokens.append((i, word))
+            if prev_token is not None:
+                prev_i, prev_word = prev_token
+                new_tokens.append((prev_i, prev_word + ' ' + word))
+            prev_token = i, word
+    tokens = new_tokens
+
+    return tokens
 
 
 def _worker(df_str, gi, lock):
@@ -106,7 +114,7 @@ def _worker(df_str, gi, lock):
     id, title, content = df_str
 
     def add_words(text, is_title):
-        for i, word in enumerate(get_tokens(text)):
+        for i, word in get_tokens(text):
             index.add_word(word, id, i, is_title)
 
     add_words(title, True)
