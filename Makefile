@@ -64,12 +64,7 @@ reqs_dev_file := requirements-dev.txt
 reqs_file := requirements.txt
 py_files := $(shell find . -name "*.py" | cut -c 3-)
 
-pkgs :=
 reqs_dev :=
-
-install:	##@dev	Install specific packages, passed by `pkgs` arg.
-	@$(pip_tool) install --skip-lock $(pkgs)
-	@$(MAKE) -f $(THIS_FILE) lock
 
 reqs:	##@dev	Install all project dependencies.
 	@$(pip_tool) install --dev
@@ -102,4 +97,4 @@ clean:	##@basic	Do the cleaning, removing unnecessary files.
 
 ## PHONY TARGETS ##
 
-.PHONY: all help install reqs check lock clean
+.PHONY: all help reqs check lock clean

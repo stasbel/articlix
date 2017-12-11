@@ -6,15 +6,18 @@ Information retrieval project at SPbAU 7th term
 
 ### Dev
 
-We use [pipenv](https://docs.pipenv.org/) as a primary tool for development.  
-See [Pipfile](Pipfile), [Pipfile.lock](Pipfile.lock), 
-[requirements-dev.txt](requirements-dev.txt) and
-[requirements.txt](requirements.txt) for full specification of platform, python
-and dependency packages.
+We use python and [pipenv](https://docs.pipenv.org/) as a primary tools for 
+development. See [Pipfile](Pipfile), [Pipfile.lock](Pipfile.lock), 
+[requirements-dev.txt](requirements-dev.txt)(if any) and
+[requirements.txt](requirements.txt) for full specification of 
+platform, python and dependency packages.  
+Basically, to reproduce enviroment, you need to run `pip install -r 
+requirements.txt` with certain version of python. However, it is recommended 
+to use **virtualenv**. 
 
 ### Makefile
 
-We provided [Makefile](Makefile) for convinient commands implementation.  
+We provide [Makefile](Makefile) for convinient commands implementation.  
 Run `make help` for get info on that.
 
 ### Prerequisites
@@ -23,7 +26,7 @@ Run `make help` for get info on that.
 
 ## Usage
 
-We provided [main.py](main.py) script, which implements cli interface.  
+We provide [main.py](main.py) script, which implements cli interface.  
 Run `python main.py -h` to get info on that.
 
 ### Crawler
@@ -32,14 +35,9 @@ Run `python main.py -h` to get info on that.
 
 ### Index
 
-U can now preprocess data (look at [this](articlix/index/clean.ipynb)).  
-Then, `python main.py --dfpath="data/clean_articles.h5" --indexpath="data/index.json" --workers=8 index`.
-
-### Web interface
-
-`python main.py web_interface`
-
-Then you can find page on port 8080.
+You can now preprocess data (look at [this](articlix/index/clean.ipynb)).  
+Then `python main.py --dfpath="data/clean_articles.h5" 
+--indexpath="data/index.json" --workers=8 index`.
 
 ### Data
 
@@ -48,6 +46,11 @@ Then you can find page on port 8080.
 ### Search
 
 [Examples](articlix/search/search.ipynb)
+
+### Web interface
+
+Run `python main.py web_interface`. Then you can find page 
+at localhost on port 8080.
 
 ## License
 
