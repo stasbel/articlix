@@ -13,7 +13,7 @@ development. See [Pipfile](Pipfile), [Pipfile.lock](Pipfile.lock),
 platform, python and dependency packages.  
 Basically, to reproduce enviroment, you need to run `pip install -r 
 requirements.txt` with certain version of python. However, it is recommended 
-to use **virtualenv**. 
+to use [virtualenv](https://virtualenv.pypa.io/en/stable/). 
 
 ### Makefile
 
