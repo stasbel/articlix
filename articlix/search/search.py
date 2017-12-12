@@ -23,13 +23,16 @@ class Articlix:
         self.idf_smooth = idf_smooth
         self.tf_do_log = tf_do_log
         self.score_treshold = score_treshold
-
+        
+        # Initial calculations
         self.N = len(self.meta)
         self.c1 = self.k1 + 1
         dls = (meta.ttitle_len + meta.tcontent_len).as_matrix()
         self.c2 = self.k1 * ((1 - b) + b * dls / np.mean(dls))
-        self.prior_scores = sum(self._scores(prior, False)
-                                for prior in self.priors)
+        vecs = [np.zeros(self.N)]
+        for prior in self.priors:
+            vecs.append(self._scores(prior, False))
+        self.prior_scores = np.sum(np.stack(vecs), axis=0)
 
     @lru_cache(maxsize=1024)
     def find(self, q, *, topn=5, add_scores=True, order='scores'):
@@ -68,7 +71,7 @@ class Articlix:
             return subdf.drop('scores', axis=1)
 
     def _scores(self, q, spellcheck):
-        vecs = []
+        vecs = [np.zeros(self.N)]
         for _, t in get_tokens(q, spellcheck):
             idf = self._idf(t)
             tf = self._tf_vec(t)
