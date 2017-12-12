@@ -19,8 +19,8 @@ def get_tokens_(text, spellcheck):
 class Interface:
     def __init__(self):        
         print("Reading data ...")
-        df = pd.read_hdf('data/clean_articles.h5')
-        ix = ujson.load(open('data/index.json', 'r'))
+        df = pd.read_hdf('data/clean_articles2.h5')
+        ix = ujson.load(open('data/index2.json', 'r'))
         self.ss = Articlix(df, ix, spellcheck=False)
 
     def check_query(self, q):
@@ -45,7 +45,7 @@ class Interface:
         query = arguments['query'].value
         import copy 
         new_args = copy.deepcopy(arguments)
-        is_better = self.ss.find(query, topn=topn, order=order, add_scores=True)[0][0] < self.ss.find(corrected_query, topn=topn, order=order, add_scores=True)[0][0]
+        is_better = list(self.ss.find(query, topn=topn, order=order, add_scores=True)['scores'])[0] < list(self.ss.find(corrected_query, topn=topn, order=order, add_scores=True)['scores'])[0]
         if is_better:
             s = b'Do you mean: '
             new_args['query'].value = ' '.join(get_tokens_(new_args['query'].value, True))
@@ -191,27 +191,15 @@ class Interface:
     
     def highlight_words(self, query, text, doc_id, is_title, get_description=False, window_size=None):
         positions = []
-        for q in get_tokens(query, False):
+        for i, q in get_tokens(query, False):
             for d, pos, is_t in self.ss.index.get(q, []):
                 if d == doc_id and is_title == is_t:
                     positions.append(pos)
-        positions = np.array(positions)
-        frame = ''
-        cur_i = 0
-        real_i = 0
-        real_positions = []
-        for i, token in enumerate(get_tokens_(text, False)):
-            if token not in stopwords.words('english'):
-                if cur_i in positions:
-                    real_positions.append(real_i)
-                cur_i += 1
-            real_i += len(token) + 1
-        text = ' '.join(get_tokens_(text, False))
-        positions = np.array(real_positions)                
+        positions = np.array(positions)             
         if len(positions) == 0:
             if get_description and window_size is not None:
-                return b'...' + text[:window_size].encode('utf8') + b'...<br>'
-            return b'...' + text.encode('utf8') + b'...<br>'
+                return text[:window_size].encode('utf8') + b'<br>'
+            return text.encode('utf8') + b'<br>'
 
         if not get_description or window_size is None:
             window_size = len(text)
@@ -235,11 +223,11 @@ class Interface:
                 i += 1
             else:
                 s += b'<b>'
-                while i < i_from + window_size and text[i].isalpha():
+                while i < i_from + window_size and i < len(text) and text[i].isalpha():
                     s += text[i].encode('utf8')
                     i += 1
                 s += b'</b>'
-        s += b'...<br>'
+        s += b'<br>'
         return s
 
     def run(self):
