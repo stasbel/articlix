@@ -47,7 +47,16 @@ class Interface:
         query = arguments['query'].value
         import copy 
         new_args = copy.deepcopy(arguments)
-        is_better = list(self.ss.find(query, topn=topn, order=order, add_scores=True)['scores'])[0] < list(self.ss.find(corrected_query, topn=topn, order=order, add_scores=True)['scores'])[0]
+        not_cor_scores = list(self.ss.find(query, topn=topn, order=order, add_scores=True)['scores'])
+        cor_scores = list(self.ss.find(corrected_query, topn=topn, order=order, add_scores=True)['scores'])
+        if len(not_cor_scores) == 0 and len(cor_scores) > 0:
+            is_better = True
+        elif len(cor_scores) == 0 and len(not_cor_scores) > 0:
+            is_better = False
+        elif len(not_cor_scores) == 0 and len(cor_scores) == 0:
+            return b'Nothing was found...'
+        else:
+            is_better = cor_scores[0] > not_cor_scores[0]
         if is_better:
             s = b'Do you mean: '
             new_args['query'].value = ' '.join(get_tokens_(new_args['query'].value, True))
