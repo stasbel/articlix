@@ -19,8 +19,10 @@ def get_tokens_(text, spellcheck):
 class Interface:
     def __init__(self):        
         print("Reading data ...")
-        df = pd.read_hdf('data/clean_articles2.h5')
-        ix = ujson.load(open('data/index2.json', 'r'))
+        df = pd.DataFrame()
+        for chunk in  pd.read_hdf('/home/katenos823/articlix/data/clean_articles2.h5', chunksize=3):
+            df = pd.concat([df, chunk], ignore_index=True)
+        ix = ujson.load(open('/home/katenos823/articlix/data/index2.json', 'r'))
         self.ss = Articlix(df, ix, spellcheck=False)
 
     def check_query(self, q):
@@ -168,7 +170,8 @@ class Interface:
 
     def create_table(self, q, pd_table):
         s = b'<table>'
-        s += b'<tr><td style="width: 500">Results</td><td>Published date</td><td>Estimated time to read</td><td>Number of likes</td><td>Number of comments</td></tr>'
+        s += b'<tr><td style="width: 500"></td><td>Published</td><td>Estimated time</td><td>Number</td><td>Number of</td></tr>'
+        s += b'<tr><td style="width: 500">Results</td><td>date</td><td>to read</td><td>of likes</td><td>comments</td></tr>'
         for doc_id, row in pd_table.iterrows():
             s += b'<tr>'
             s += b'<td  style="width: 500">' + self.get_article(q, doc_id, row['url'], row['title'], row['content']) + b'</td>'
