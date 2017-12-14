@@ -112,7 +112,7 @@ class Interface:
                     <label><b>What are you looking for?:</b></label>
                     <br>
                     <div class="col-sm-6">
-                    <div class="input-group" >
+                    <div class="input-group">
                     <input type="text" name="query" class="form-control" placeholder="Search for..." aria-label="Search for..."''' + (b' value="' + query.encode("utf8") + b'"') + b'''> 
                     <span class="input-group-btn">
                     <input class="btn btn-outline-success" type="submit" value="Search!" name="search">
@@ -120,13 +120,12 @@ class Interface:
                     </div></div>
                     <label><b> Write about yourself:</b></label>
                     <br>
-                    <div class="col-sm-6>
-                    <textarea class="form-control" name="priority" cols="100" rows="3">''' + (prior.encode("utf8")) + b'''</textarea>
+                    <div class="col-sm-6">
+                    <textarea placeholder="Information about myself..." class="form-control" name="priority" cols="100" rows="3">''' + (prior.encode("utf8")) + b'''</textarea>
                     </div>
                     <br>
                     <div class="container">
-                    <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-md-6">
                     <label><b>Sort by:</b></label>
                     <select name="sort_by" class="custom-select">
                     <option''' + (b' selected' if order == 'scores' else b'') + b''' value="scores">Relevance</option>
@@ -136,7 +135,7 @@ class Interface:
                     <option''' + (b' selected' if order == 'comments' else b'') + b''' value="comments">Number of comments</option>
                     </select>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-md-6">
                     <label><b>Show:</b></label>
                     <select name="topn" class="custom-select">
                     <option''' + (b' selected' if topn == '5' else b'') + b''' value="5">5</option>
@@ -146,7 +145,6 @@ class Interface:
                     <option''' + (b' selected' if topn == '50' else b'') + b''' value="50">50</option>
                     </select>
                     <label>results.</label>
-                    </div>
                     </div>
                     </div>
                     <br>
