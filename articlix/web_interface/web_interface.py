@@ -60,7 +60,7 @@ class Interface:
         if is_better:
             s = b'Do you mean: '
             new_args['query'].value = ' '.join(get_tokens_(new_args['query'].value, True))
-            s += b'<a href="http://127.0.0.1:8080/?' + urllib.parse.urlencode({key: new_args[key].value for key in new_args}).encode("utf8") + b'">' + cor_q_str + b'</a>'
+            s += b'<a href="http://35.227.117.218/?' + urllib.parse.urlencode({key: new_args[key].value for key in new_args}).encode("utf8") + b'">' + cor_q_str + b'</a>'
             s += b'?<br><br>'
             return s
         return b''
@@ -84,6 +84,15 @@ class Interface:
         <html>
             <head>
                 <title>Hello Articlix!</title>
+                <style type="text/css">
+                .checkboxgroup {
+                    display: inline-block;
+                    text-align: center;
+                }
+                .checkboxgroup label {
+                    display: block;
+                }
+                </style>
             </head>
             <body>
                 <h1> Articlix </h1>
@@ -178,16 +187,26 @@ class Interface:
         return s
 
     def create_table(self, q, pd_table):
+        def create_stars(name):
+            def star(number):
+                bnum = str(number).encode("utf8")
+                return b'''<div class="checkboxgroup">
+    <label for="my_radio_button_id''' + bnum + b'''">''' + bnum + b'''</label>
+    <input type="radio" name="''' + name.encode("utf8") + b'''" id="my_radio_button_id''' + bnum + b'''" />
+</div>\n'''
+            return b'''<div id="checkboxes">\n''' + star(1) + star(2) + star(3) + star(4) + star(5) + b'''<input type="submit" value="Assess"><br><br><br></div>'''
+            
         s = b'<table>'
-        s += b'<tr><td style="width: 500"></td><td>Published</td><td>Estimated time</td><td>Number</td><td>Number of</td></tr>'
-        s += b'<tr><td style="width: 500">Results</td><td>date</td><td>to read</td><td>of likes</td><td>comments</td></tr>'
-        for doc_id, row in pd_table.iterrows():
+        s += b'<tr><td style="width: 500"></td><td>Published</td><td>Estimated time</td><td>Number</td><td>Number of</td><td></td></tr>'
+        s += b'<tr><td style="width: 500">Results</td><td>date</td><td>to read</td><td>of likes</td><td>comments</td><td></td></tr>'
+        for i, (doc_id, row) in enumerate(pd_table.iterrows()):
             s += b'<tr>'
             s += b'<td  style="width: 500">' + self.get_article(q, doc_id, row['url'], row['title'], row['content']) + b'</td>'
             s += b'<td>' + str(pd.to_datetime(row['published_date']).date()).encode('utf8') + b'</td>'
             s += b'<td>' + str(row['estimate_time']).encode('utf8') + b'</td>'
             s += b'<td>' + str(row['likes']).encode('utf8') + b'</td>'
             s += b'<td>' + str(row['comments']).encode('utf8') + b'</td>'
+            s += b'<td>' + create_stars("radio" + str(i)) + '</td>'
             s += b'</tr>'
         s += b'</table>'
         return s
@@ -246,7 +265,7 @@ class Interface:
         try:
             from wsgiref.simple_server import make_server
             httpd = make_server('0.0.0.0', 5000, self.refresh)
-            print('Serving on http://127.0.0.1:8080...')
+            print('Serving...')
             httpd.serve_forever()
         except KeyboardInterrupt:
             print('Goodbye.')
