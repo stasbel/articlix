@@ -52,6 +52,11 @@ Then `python main.py --dfpath="data/clean_articles.h5"
 Run `python main.py web_interface`. Then you can find page 
 at localhost on port 8080.
 
+### Evaluation
+
+You will need assessments log file, obtained from server.  
+[DCG](articlix/evaluation/dcg.ipynb)
+
 ## License
 
 [MIT](LICENSE)
