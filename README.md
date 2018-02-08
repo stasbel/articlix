@@ -2,6 +2,8 @@
 
 Information retrieval project at SPbAU 7th term
 
+![screen](misc/screen.png)
+
 ## Installation
 
 ### Dev
@@ -18,7 +20,7 @@ to use [virtualenv](https://virtualenv.pypa.io/en/stable/).
 ### Makefile
 
 We provide [Makefile](Makefile) for convinient commands implementation.  
-Run `make help` for get info on that.
+Run `make help` to get info on that.
 
 ### Prerequisites
 
@@ -61,7 +63,7 @@ You will need assessments log file, obtained from server.
 
 [Web](http://35.227.117.218/)  
 [Slides](https://docs.google.com/presentation/d/e/2PACX-1vT5Qs8ly5csvfrqpafVQ4H0pQTr0U1S1XYF1gudEBVSxXaMwgUgVN4zEBDhO11j3d2Td7VmJ_PK6VGJ/pub?start=false&loop=false&delayms=3000)  
-[Report](report/articlix-final-report.pdf)
+[Report](misc/articlix-final-report.pdf)
 
 ## License
 

@@ -1,10 +1,11 @@
-# This Makefile provide some useful commands for developing and using this
-# project. Remeber, this is just for the convinience, so dont rely on them
-# too much. You can do all sort of things (including running and using code)
+# This Makefile provide some useful commands for developing and using project.
+# Remeber, this is just for the convinience, so dont rely on them too much.
+# You can do all sort of things (including running and using code)
 # all by yourself.
 # Partially based on good style guide on creating Makefiles at
 # `http://clarkgrubb.com/makefile-style-guide`, still not following it blindly.
 # Author: Stanislav Belyaev stasbelyaev96@gmail.com
+# Gist: https://gist.github.com/stasbel/dfa118b3bee2f7665e55cf8808dbfe21
 
 ### PROLOGUE ###
 
@@ -23,6 +24,7 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
 # ANSI colors
 GREEN  := $(shell tput -Txterm setaf 2)
+RED    := $(shell tput -Txterm setaf 1)
 WHITE  := $(shell tput -Txterm setaf 7)
 YELLOW := $(shell tput -Txterm setaf 3)
 RESET  := $(shell tput -Txterm sgr0)
@@ -62,17 +64,18 @@ help:	##@miscellaneous	Show this help.
 pip_tool := pipenv
 reqs_dev_file := requirements-dev.txt
 reqs_file := requirements.txt
-py_files := $(shell find . -name "*.py" | cut -c 3-)
+py_files := $(shell find . -name '*.py' | cut -c 3-)
 
 reqs_dev :=
 
 reqs:	##@dev	Install all project dependencies.
 	@$(pip_tool) install --dev
+	$(SUCCESS)
 
 check:	##@dev	Check project vulnerabilities and code style (pep + flake).
 	@$(pip_tool) check
 	@for file in $(py_files); do \
-		echo "check" $$file ; \
+		echo 'Checking' \`$$file\`...; \
 		$(pip_tool) check --style $$file ; \
 	done
 	$(SUCCESS)
@@ -93,7 +96,8 @@ endif
 
 clean:	##@basic	Do the cleaning, removing unnecessary files.
 	@echo 'Removing unnecessary files...'
-	@rm -rf *~ \#*
+	@rm -rf *~ \#* babs
+	$(SUCCESS)
 
 ## PHONY TARGETS ##
 
